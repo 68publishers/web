@@ -1,0 +1,22 @@
+includes:
+    #- packages/@default.neon
+    #- php/@default.neon
+
+parameters:
+    #assetsDir: %appDir%/../assets
+
+php:
+    date.timezone: UTC
+
+application:
+    mapping:
+        *: App\*Module\Presenter\*Presenter
+
+tracy:
+    maxDepth: 6
+
+http:
+    proxy: ::array_filter(::explode(',', ::env(TRUSTED_PROXIES, '')))
+
+services:
+    routing.router: App\RouterFactory()::create()
