@@ -20,3 +20,7 @@ http:
 
 services:
     routing.router: App\RouterFactory()::create()
+    apiHandler: App\Infrastructure\ApiHandler\Slack\SlackApiHandler(
+        token: ::env(SLACK_TOKEN)
+        channel: ::env(SLACK_CHANNEL)
+    )
