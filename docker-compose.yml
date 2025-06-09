@@ -1,10 +1,33 @@
 services:
+  nginx:
+    image: nginx:1.27.1
+    container_name: web-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: always
+    volumes:
+      - ./docker/nginx/conf/:/etc/nginx/conf.d
+      - ./docker/nginx/templates/:/etc/nginx/templates/
+      - ./docker/nginx/certs:/etc/nginx/ssl
+      - ./docker/nginx/.htpasswd:/etc/nginx/.htpasswd
+    environment:
+      - DOLLAR=$$
+      - NGINX_DOMAIN_NAME=${NGINX_DOMAIN_NAME:-amp.local}
+      - NGINX_RESTRICT_ACCESS=${NGINX_RESTRICT_ACCESS:-0}
+      - NGINX_ENVSUBST_TEMPLATE_DIR=${NGINX_TEMPLATE_DIR:-/etc/nginx/templates/default}
+    command: [ "nginx", "-g", "daemon off;" ]
+    depends_on:
+      app:
+        condition: service_started
+    networks:
+      - backend
+
   app:
     image: 68publishers/php:8.1-unit-dev-1.1.0
-    container_name: web
+    container_name: web-app
     ports:
-      - "80:8080"
-      - "8080:8080"
+      - "8080"
     volumes:
       - .:/var/www/html:cached
     networks:
