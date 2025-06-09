@@ -20,9 +20,12 @@ use Tracy\Debugger;
 use function array_map;
 use function array_values;
 use function implode;
+use function in_array;
 use function json_decode;
 use function json_encode;
 use function str_contains;
+use function str_split;
+use function strtolower;
 
 final class SlackApiHandler implements ApiHandlerInterface
 {
@@ -35,7 +38,7 @@ final class SlackApiHandler implements ApiHandlerInterface
 
     public function handle(IRequest $request, IResponse $response): Response
     {
-        if ('' === $this->token && '' === $this->channel) {
+        if ('' === $this->token || '' === $this->channel) {
             $response->setCode($response::S503_ServiceUnavailable);
 
             return new JsonResponse(
@@ -47,8 +50,13 @@ final class SlackApiHandler implements ApiHandlerInterface
         }
 
         $headers = [];
+        $sensitiveHeaders = ['authorization', 'cookie'];
 
         foreach ($request->getHeaders() as $name => $value) {
+            if (in_array(strtolower($name), $sensitiveHeaders, true)) {
+                $value = '*****';
+            }
+
             $headers[] = "$name: $value";
         }
 
@@ -56,8 +64,9 @@ final class SlackApiHandler implements ApiHandlerInterface
             try {
                 $body = json_encode(
                     value: $request->getPost(),
-                    flags: JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
+                    flags: JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS,
                 );
+                $body = str_replace('\\"', '"', $body);
             } catch (JsonException $e) {
                 Debugger::log($e, Debugger::ERROR);
                 $response->setCode($response::S400_BadRequest);
@@ -79,8 +88,9 @@ final class SlackApiHandler implements ApiHandlerInterface
                         associative: false,
                         flags: JSON_THROW_ON_ERROR,
                     ),
-                    flags: JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT,
+                    flags: JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS,
                 );
+                $body = str_replace('\\"', '"', $body);
             } catch (JsonException $e) {
                 # data may not be a json...
             }
@@ -89,47 +99,53 @@ final class SlackApiHandler implements ApiHandlerInterface
         $client = $this->getClient();
 
         try {
-            $messageResponse = $client->chatPostMessage([
+            $blocks = [
+                (object) [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => 'New message received (' . (new DateTimeImmutable('now'))->format('Y-m-d H:i:s') . ')',
+                    ],
+                ],
+                (object) [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => '*Headers*',
+                    ],
+                ],
+                (object) [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => '```' . implode("\n", $headers) . '```',
+                    ],
+                ],
+                (object) [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => '*Body*',
+                    ],
+                ],
+            ];
+
+            foreach (str_split($body, 2900) as $chunk) {
+                $blocks[] = [
+                    'type' => 'section',
+                    'text' => [
+                        'type' => 'mrkdwn',
+                        'text' => '```' . $chunk . '```',
+                    ],
+                ];
+            }
+
+            $client->chatPostMessage([
                 'channel' => $this->channel,
-                'blocks' => json_encode([
-                    (object) [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'mrkdwn',
-                            'text' => ':envelope_with_arrow: New message received (' . (new DateTimeImmutable('now'))->format('Y-m-d H:i:s') . ')',
-                        ],
-                    ],
-                    (object) [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'mrkdwn',
-                            'text' => '*Headers*',
-                        ],
-                    ],
-                    (object) [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'mrkdwn',
-                            'text' => '```' . implode("\n", $headers) . '```',
-                        ],
-                    ],
-                    (object) [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'mrkdwn',
-                            'text' => '*Body*',
-                        ],
-                    ],
-                    (object) [
-                        'type' => 'section',
-                        'text' => [
-                            'type' => 'mrkdwn',
-                            'text' => '```' . $body . '```',
-                        ],
-                    ],
-                ]),
+                'blocks' => json_encode(value: $blocks, flags: JSON_THROW_ON_ERROR),
+                'icon_emoji' => ':envelope_with_arrow:',
             ]);
-        } catch (SlackErrorResponse $e) {
+        } catch (SlackErrorResponse|JsonException $e) {
             Debugger::log($e, Debugger::ERROR);
             $response->setCode($response::S500_InternalServerError);
 
