@@ -1,6 +1,6 @@
-NGINX_DOMAIN_NAME := "68publishers.local"
-COMPOSE_ENV := "local" # "local" or "stage"
-CERTBOT_EMAIL := "info@68publishers.io"
+NGINX_DOMAIN_NAME := 68publishers.local
+COMPOSE_ENV := local # "local" or "stage"
+CERTBOT_EMAIL := info@68publishers.io
 
 ifneq (,$(wildcard ./.env.dist))
 	include .env.dist
