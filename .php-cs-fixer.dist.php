@@ -9,7 +9,6 @@ use PhpCsFixerCustomFixers\Fixer\PromotedConstructorPropertyFixer;
 
 $finder = Finder::create()
     ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/config/php')
     ->in(__DIR__ . '/public');
 
 return (new Config())

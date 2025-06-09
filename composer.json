@@ -12,6 +12,7 @@
         "68publishers/environment": "^1.0",
         "68publishers/tracy-git-version": "^1.1",
         "68publishers/webpack-encore-bundle": "^3.0",
+        "jolicode/slack-php-api": "^4.8",
         "latte/latte": "^3.0",
         "nette/application": "^3.1",
         "nette/bootstrap": "^3.2",
@@ -42,7 +43,8 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
-            "68publishers/environment": true
+            "68publishers/environment": true,
+            "php-http/discovery": true
         }
     }
 }

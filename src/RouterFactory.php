@@ -12,11 +12,6 @@ final class RouterFactory
     {
         $router = new RouteList();
 
-        $router->withModule('Api')
-            ->addRoute('/api/<presenter>', [
-                'action' => 'default',
-            ]);
-
         $router->addRoute('<presenter>[/<slug>]', [
             'presenter' => 'Homepage',
             'action' => 'default',
