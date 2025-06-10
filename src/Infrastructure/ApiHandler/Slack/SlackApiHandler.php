@@ -43,8 +43,11 @@ final class SlackApiHandler implements ApiHandlerInterface
 
             return new JsonResponse(
                 payload: [
-                    'accepted' => false,
-                    'error' => 'Service is not available.',
+                    'status' => 'error',
+                    'data' => [
+                        'code' => $response::S503_ServiceUnavailable,
+                        'error' => 'Service is not available.',
+                    ],
                 ],
             );
         }
@@ -73,8 +76,11 @@ final class SlackApiHandler implements ApiHandlerInterface
 
                 return new JsonResponse(
                     payload: [
-                        'accepted' => false,
-                        'error' => 'Invalid POST data.',
+                        'status' => 'error',
+                        'data' => [
+                            'code' => $response::S400_BadRequest,
+                            'error' => 'Invalid POST data.',
+                        ],
                     ],
                 );
             }
@@ -151,8 +157,11 @@ final class SlackApiHandler implements ApiHandlerInterface
 
             return new JsonResponse(
                 payload: [
-                    'accepted' => false,
-                    'error' => 'Unable to process the message.',
+                    'status' => 'error',
+                    'data' => [
+                        'code' => $response::S500_InternalServerError,
+                        'error' => 'Unable to process the message.',
+                    ],
                 ],
             );
         }
@@ -180,8 +189,8 @@ final class SlackApiHandler implements ApiHandlerInterface
 
         return new JsonResponse(
             payload: [
-                'accepted' => true,
-                'error' => null,
+                'status' => 'success',
+                'data' => (object) [],
             ],
         );
     }
