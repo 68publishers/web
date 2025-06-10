@@ -20,7 +20,21 @@ http:
 
 services:
     routing.router: App\RouterFactory()::create()
-    apiHandler: App\Infrastructure\ApiHandler\Slack\SlackApiHandler(
-        token: ::env(SLACK_TOKEN)
-        channel: ::env(SLACK_CHANNEL)
-    )
+
+    apiHandler:
+        autowired: App\Application\ApiHandler\ApiHandlerInterface
+        type: App\Application\ApiHandler\ApiHandlerInterface
+        create: @apiHandler.loggable
+
+    apiHandler.loggable:
+        autowired: no
+        create: App\Infrastructure\ApiHandler\Loggable\LoggableApiHandler(
+            inner: @apiHandler.slack
+        )
+
+    apiHandler.slack:
+        autowired: no
+        create: App\Infrastructure\ApiHandler\Slack\SlackApiHandler(
+            token: ::env(SLACK_TOKEN)
+            channel: ::env(SLACK_CHANNEL)
+        )

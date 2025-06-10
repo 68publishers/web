@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Infrastructure\ApiHandler\Slack;
 
 use App\Application\ApiHandler\ApiHandlerInterface;
+use App\Infrastructure\ApiHandler\Helpers;
 use DateTimeImmutable;
 use JoliCode\Slack\Client;
 use JoliCode\Slack\ClientFactory;
@@ -20,12 +21,8 @@ use Tracy\Debugger;
 use function array_map;
 use function array_values;
 use function implode;
-use function in_array;
-use function json_decode;
 use function json_encode;
-use function str_contains;
 use function str_split;
-use function strtolower;
 
 final class SlackApiHandler implements ApiHandlerInterface
 {
@@ -52,54 +49,28 @@ final class SlackApiHandler implements ApiHandlerInterface
             );
         }
 
-        $headers = [];
-        $sensitiveHeaders = ['authorization', 'cookie'];
+        $headers = Helpers::getHeaders(
+            request: $request,
+        );
 
-        foreach ($request->getHeaders() as $name => $value) {
-            if (in_array(strtolower($name), $sensitiveHeaders, true)) {
-                $value = '*****';
-            }
+        try {
+            $body = Helpers::getBody(
+                request: $request,
+                escape: false,
+            );
+        } catch (Throwable $e) {
+            Debugger::log($e, Debugger::ERROR);
+            $response->setCode($response::S400_BadRequest);
 
-            $headers[] = "$name: $value";
-        }
-
-        if (str_contains($request->getHeader('Content-Type') ?? '', 'multipart/form-data') || str_contains($request->getHeader('Content-Type') ?? '', 'application/x-www-form-urlencoded')) {
-            try {
-                $body = json_encode(
-                    value: $request->getPost(),
-                    flags: JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS,
-                );
-                $body = str_replace('\\"', '"', $body);
-            } catch (JsonException $e) {
-                Debugger::log($e, Debugger::ERROR);
-                $response->setCode($response::S400_BadRequest);
-
-                return new JsonResponse(
-                    payload: [
-                        'status' => 'error',
-                        'data' => [
-                            'code' => $response::S400_BadRequest,
-                            'error' => 'Invalid POST data.',
-                        ],
+            return new JsonResponse(
+                payload: [
+                    'status' => 'error',
+                    'data' => [
+                        'code' => $response::S400_BadRequest,
+                        'error' => 'Invalid POST data.',
                     ],
-                );
-            }
-        } else {
-            $body = (string) $request->getRawBody();
-
-            try {
-                $body = json_encode(
-                    value: json_decode(
-                        json: $body,
-                        associative: false,
-                        flags: JSON_THROW_ON_ERROR,
-                    ),
-                    flags: JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS,
-                );
-                $body = str_replace('\\"', '"', $body);
-            } catch (JsonException $e) {
-                # data may not be a json...
-            }
+                ],
+            );
         }
 
         $client = $this->getClient();
