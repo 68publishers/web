@@ -36,8 +36,11 @@ final class HomepagePresenter extends NettePresenter
                 $httpResponse->setCode($httpResponse::S500_InternalServerError);
 
                 $response = new JsonResponse([
-                    'accepted' => false,
-                    'error' => 'Internal server error.',
+                    'status' => 'error',
+                    'data' => [
+                        'code' => $httpResponse::S500_InternalServerError,
+                        'error' => 'Internal server error.',
+                    ],
                 ]);
             }
 
