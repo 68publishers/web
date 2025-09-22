@@ -28,7 +28,7 @@ restart:
 
 mkcert:
 	@if [ "stage" = "${COMPOSE_ENV}" ]; then \
-		docker run -it --rm --name certbot \
+		docker run --rm --name certbot \
 			-v ./docker/nginx/certs:/etc/letsencrypt \
 			-v ./docker/certbot/www:/var/www/certbot \
 			-v ./docker/certbot/secrets:/.secrets \
@@ -50,7 +50,7 @@ certs-renew:
   		echo "\033[1;91mError: The command certs-renew can be called in the stage environment only.\033[0m"; \
   		exit 1; \
   	fi
-	@docker run -it --rm --name certbot \
+	@docker run --rm --name certbot \
 		-v ./docker/nginx/certs:/etc/letsencrypt \
 		-v ./docker/certbot/www:/var/www/certbot \
 		-v ./docker/certbot/secrets:/.secrets \
@@ -60,22 +60,22 @@ certs-renew:
 	@make certs-renew.post-hook
 
 certs-renew.post-hook:
-ifneq (,$(wildcard ./docker/certbot/renew/renewed.txt))
-	@rm ./docker/certbot/renew/renewed.txt
-	@docker exec -it web-nginx nginx -s reload
-	@echo "\033[0;34mNginx reloaded\033[0m"
-endif
+	@if [ -f ./docker/certbot/renew/renewed.txt ]; then \
+		rm ./docker/certbot/renew/renewed.txt; \
+		docker exec web-nginx nginx -s reload; \
+		echo "\033[0;34mNginx reloaded\033[0m"; \
+	fi
 
 cache-clear:
-	docker exec -it web-app rm -rf var/cache/*
-	docker exec -it web-app rm -rf var/log/*
+	docker exec -t web-app rm -rf var/cache/*
+	docker exec -t web-app rm -rf var/log/*
 
 install:
 	make cache-clear
 	make install-composer
 
 install-composer:
-	docker exec -it web-app composer install --no-interaction --no-ansi --prefer-dist --no-progress --optimize-autoloader
+	docker exec -t web-app composer install --no-interaction --no-ansi --prefer-dist --no-progress --optimize-autoloader
 
 init-with-certs:
 	@echo "\033[1;94mDo you want to setup the application on a domain ${NGINX_DOMAIN_NAME} with \"${COMPOSE_ENV}\" environment? [y/n]\033[0m"
@@ -104,10 +104,10 @@ qa:
 	@echo "not implemented" >&2
 
 stan:
-	docker exec -it web-app vendor/bin/phpstan analyse
+	docker exec -t web-app vendor/bin/phpstan analyse
 
 cs:
-	docker exec -it web-app vendor/bin/php-cs-fixer fix -v
+	docker exec -t web-app vendor/bin/php-cs-fixer fix -v
 
 coverage:
 	@echo "not implemented" >&2
