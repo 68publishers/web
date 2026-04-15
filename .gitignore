@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# fumadocs
+/.source/
+
+# research / scratch
+analyza_konkurence.csv
+
+# editors
+.idea/
+
+# claude code
+.claude/

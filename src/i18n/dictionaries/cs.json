@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "work": "Naše práce",
+    "aiFirst": "AI first",
+    "services": "Služby",
+    "why": "Proč '68",
+    "blog": "Blog",
+    "docs": "Dokumentace",
+    "cta": "Pojďme si promluvit"
+  },
+  "footer": {
+    "tagline": "Dlouhodobý technologický partner pro vážné digitální systémy.",
+    "rights": "Všechna práva vyhrazena.",
+    "sections": {
+      "company": "Společnost",
+      "services": "Služby",
+      "resources": "Zdroje",
+      "legal": "Právní"
+    }
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Custom software development",
+      "headline": "Stavíme systémy, které mají vydržet.",
+      "claim": "Dlouhodobý technologický partner pro náročné B2B projekty. Žádný hype, žádné agenturní triky — jen solidní software.",
+      "cta": "Pojďme si promluvit"
+    }
+  }
+}
