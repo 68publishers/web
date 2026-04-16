@@ -41,20 +41,17 @@ export async function parseInbox(request: Request): Promise<InboxRequest> {
   ) {
     const form = await request.formData();
     const fields: Record<string, unknown> = {};
-
     for (const [key, value] of form.entries()) {
       if (value instanceof File) {
-        const buffer = Buffer.from(await value.arrayBuffer());
         files.push({
           name: value.name,
-          buffer,
+          buffer: Buffer.from(await value.arrayBuffer()),
           mimeType: value.type || "application/octet-stream",
         });
       } else {
         fields[key] = value;
       }
     }
-
     body = JSON.stringify(fields);
   } else {
     const raw = await request.text();

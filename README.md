@@ -5,16 +5,11 @@ Positioning website for '68 Publishers — a long-term technology partner for de
 ## Stack
 
 - **Next.js 16** (App Router, Turbopack, React 19)
-- **fumadocs** for MDX content (`/docs`, `/blog`, `/work`)
-- **Tailwind v4** + **shadcn/ui** (Base UI) for styling
-- **next-themes** for dark-first theming
-- **pino** + **@slack/web-api** for the `/api/inbox` endpoint (ported from the old PHP site)
+- **fumadocs** (UI, core, MDX) for docs + MDX content layer
+- **Tailwind v4** with fumadocs design system (shadcn + preset CSS)
+- **next-themes** for dark-first theming via fumadocs RootProvider
+- **pino** + **@slack/web-api** for `/api/inbox`
 - **TypeScript**, **pnpm**
-
-## Requirements
-
-- Node.js 20+
-- pnpm 9+
 
 ## Getting started
 
@@ -24,49 +19,26 @@ pnpm install
 pnpm dev
 ```
 
-The site will be available at <http://localhost:3000>. Czech is served from `/`, English from `/en`.
+Site at <http://localhost:3000>. Czech at `/`, English at `/en`.
 
-## Scripts
+## Route architecture
 
-| Command          | Description                            |
-| ---------------- | -------------------------------------- |
-| `pnpm dev`       | Dev server (Turbopack)                 |
-| `pnpm build`     | Production build                       |
-| `pnpm start`     | Serve the production build             |
-| `pnpm lint`      | Lint                                   |
-| `pnpm typecheck` | TypeScript type check (`tsc --noEmit`) |
+```
+[lang]/(marketing)/         Marketing layout (MarketingNav + footer)
+  page.tsx                  Homepage
+  work/, blog/, services/   Content pages
+  about/, contact/, why-68/ Static pages
 
-## Routes
+[lang]/docs/                Docs layout (TopNav + DocsLayout sidebar)
+  [[...slug]]/page.tsx      fumadocs pages
 
-- `/` — Czech marketing (hidden locale prefix, internal `/cs/...`)
-- `/en/*` — English marketing
-- `/docs/*` — Open-source documentation (fumadocs)
-- `/api/inbox` — POST endpoint that logs the request and forwards it to Slack
-
-## `/api/inbox`
-
-A port of the original PHP `LoggableApiHandler` + `SlackApiHandler`. Sensitive headers are redacted, the body is chunked to 2900 characters (Slack mrkdwn limit), and file uploads are sent as a separate `files.uploadV2` call. Configure via `SLACK_TOKEN` and `SLACK_CHANNEL`.
-
-Test:
-
-```bash
-curl -X POST http://localhost:3000/api/inbox \
-  -H "Content-Type: application/json" \
-  -d '{"hello": "world"}'
+api/inbox/                  POST endpoint (Slack + logging)
 ```
 
-Without Slack env vars the endpoint returns `503`.
+`(marketing)` is a route group — no URL segment. `[lang]` is hidden for default locale (cs) via fumadocs i18n middleware (`hideLocale: 'default-locale'`).
 
 ## Content
 
-MDX content lives under `content/`:
-
-- `content/docs/` — open-source package docs
-- `content/blog/` — articles
-- `content/work/` — case studies
-
-Run `pnpm exec fumadocs-mdx` after editing schemas in `source.config.ts`.
-
-## Branching
-
-This rewrite lives on the `new` branch. The previous PHP/Nette site is preserved on `origin/main` as a backup and reference (licensing POST logger + Slack integration).
+- `content/docs/` — open-source package docs (fumadocs)
+- `content/blog/` — articles (MDX collection)
+- `content/work/` — case studies (MDX collection)

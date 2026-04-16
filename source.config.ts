@@ -1,4 +1,4 @@
-import { defineConfig, defineDocs, defineCollections, frontmatterSchema } from "fumadocs-mdx/config";
+import { defineDocs, defineCollections, defineConfig, frontmatterSchema } from "fumadocs-mdx/config";
 import { z } from "zod";
 
 export const docs = defineDocs({

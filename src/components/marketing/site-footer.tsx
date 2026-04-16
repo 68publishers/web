@@ -1,10 +1,10 @@
 import Link from "next/link";
-import type { Locale } from "@/i18n/config";
-import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n";
+import type { Dict } from "@/lib/dict";
 
 interface SiteFooterProps {
   locale: Locale;
-  dict: Dictionary;
+  dict: Dict;
 }
 
 export function SiteFooter({ locale, dict }: SiteFooterProps) {
@@ -12,35 +12,27 @@ export function SiteFooter({ locale, dict }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-24 border-t border-border/60">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
+    <footer style={{ marginTop: 96, borderTop: "1px solid rgba(var(--border), 0.6)" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "48px 24px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 32 }}>
           <div>
-            <p className="font-mono text-sm tracking-tight">{"'68 Publishers"}</p>
-            <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            <p style={{ fontFamily: "monospace", fontSize: 14, fontWeight: 700, letterSpacing: "-0.01em" }}>
+              {"'68 Publishers"}
+            </p>
+            <p style={{ marginTop: 8, maxWidth: 420, fontSize: 14, color: "rgb(var(--muted-foreground))" }}>
               {dict.footer.tagline}
             </p>
           </div>
-          <nav className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted-foreground">
-            <Link href={`${base}/work`} className="hover:text-foreground">
-              {dict.nav.work}
-            </Link>
-            <Link href={`${base}/services`} className="hover:text-foreground">
-              {dict.nav.services}
-            </Link>
-            <Link href={`${base}/blog`} className="hover:text-foreground">
-              {dict.nav.blog}
-            </Link>
-            <Link href="/docs" className="hover:text-foreground">
-              {dict.nav.docs}
-            </Link>
+          <nav style={{ display: "flex", flexWrap: "wrap", gap: "8px 32px", fontSize: 14, color: "rgb(var(--muted-foreground))" }}>
+            <Link href={`${base}/work`} style={{ textDecoration: "none", color: "inherit" }}>{dict.nav.work}</Link>
+            <Link href={`${base}/services`} style={{ textDecoration: "none", color: "inherit" }}>{dict.nav.services}</Link>
+            <Link href={`${base}/blog`} style={{ textDecoration: "none", color: "inherit" }}>{dict.nav.blog}</Link>
+            <Link href={`${base}/docs`} style={{ textDecoration: "none", color: "inherit" }}>{dict.nav.docs}</Link>
           </nav>
         </div>
-        <div className="mt-10 flex flex-col items-start justify-between gap-2 border-t border-border/60 pt-6 text-xs text-muted-foreground md:flex-row md:items-center">
-          <span>
-            © {year} ’68 Publishers s.r.o. — {dict.footer.rights}
-          </span>
-          <span className="font-mono">CZ08418667</span>
+        <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid rgba(var(--border), 0.6)", display: "flex", justifyContent: "space-between", fontSize: 12, color: "rgb(var(--muted-foreground))" }}>
+          <span>© {year} '68 Publishers s.r.o. — {dict.footer.rights}</span>
+          <span style={{ fontFamily: "monospace" }}>CZ08418667</span>
         </div>
       </div>
     </footer>

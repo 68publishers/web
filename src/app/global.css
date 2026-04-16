@@ -1,0 +1,219 @@
+@import "tailwindcss";
+@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/preset.css";
+
+/* ── Design tokens ── */
+
+:root {
+  --background: 255 255 255;
+  --foreground: 39 39 42;
+  --muted: 244 244 245;
+  --muted-foreground: 113 113 122;
+  --popover: 255 255 255;
+  --popover-foreground: 39 39 42;
+  --card: 255 255 255;
+  --card-foreground: 39 39 42;
+  --border: 235 235 238;
+  --primary: 24 24 27;
+  --primary-foreground: 255 255 255;
+  --secondary: 244 244 245;
+  --secondary-foreground: 39 39 42;
+  --accent: 244 244 245;
+  --accent-foreground: 39 39 42;
+  --ring: 161 161 170;
+  --input: 228 228 231;
+  --destructive: 225 29 72;
+  --radius: 0.5rem;
+
+  --shadow-card: 0 0 0 1px rgba(0,0,0,0.06), 0 1px 2px -1px rgba(0,0,0,0.06), 0 2px 4px 0 rgba(0,0,0,0.03);
+  --shadow-card-hover: 0 0 0 1px rgba(0,0,0,0.08), 0 1px 2px -1px rgba(0,0,0,0.08), 0 2px 8px 0 rgba(0,0,0,0.08);
+  --shadow-nav: 0 1px 2px 0 rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.04);
+
+  --color-fd-background: rgb(var(--background));
+  --color-fd-foreground: rgb(var(--foreground));
+  --color-fd-muted: rgb(var(--muted));
+  --color-fd-muted-foreground: rgb(var(--muted-foreground));
+  --color-fd-popover: rgb(var(--popover));
+  --color-fd-popover-foreground: rgb(var(--popover-foreground));
+  --color-fd-card: rgb(var(--card));
+  --color-fd-card-foreground: rgb(var(--card-foreground));
+  --color-fd-border: rgb(var(--border));
+  --color-fd-primary: rgb(var(--primary));
+  --color-fd-primary-foreground: rgb(var(--primary-foreground));
+  --color-fd-secondary: rgb(var(--secondary));
+  --color-fd-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-fd-accent: rgb(var(--accent));
+  --color-fd-accent-foreground: rgb(var(--accent-foreground));
+  --color-fd-ring: rgb(var(--ring));
+}
+
+.dark {
+  --background: 9 9 11;
+  --foreground: 228 228 231;
+  --muted: 24 24 27;
+  --muted-foreground: 161 161 170;
+  --popover: 24 24 27;
+  --popover-foreground: 228 228 231;
+  --card: 24 24 27;
+  --card-foreground: 228 228 231;
+  --border: 45 45 48;
+  --primary: 244 244 245;
+  --primary-foreground: 9 9 11;
+  --secondary: 24 24 27;
+  --secondary-foreground: 228 228 231;
+  --accent: 24 24 27;
+  --accent-foreground: 228 228 231;
+  --ring: 113 113 122;
+  --input: 39 39 42;
+  --destructive: 159 18 57;
+
+  --shadow-card: 0 0 0 1px rgba(255,255,255,0.04), 0 0 0 1px rgba(39,39,42,1), 0 1px 2px 0 rgba(0,0,0,0.24), 0 2px 4px 0 rgba(0,0,0,0.24);
+  --shadow-card-hover: 0 0 0 1px rgba(255,255,255,0.06), 0 0 0 1px rgba(39,39,42,1), 0 1px 4px 0 rgba(0,0,0,0.4), 0 2px 8px 0 rgba(0,0,0,0.4);
+  --shadow-nav: 0 1px 0 0 rgba(255,255,255,0.04), 0 0 0 1px rgba(39,39,42,0.6);
+
+  --color-fd-background: rgb(var(--background));
+  --color-fd-foreground: rgb(var(--foreground));
+  --color-fd-muted: rgb(var(--muted));
+  --color-fd-muted-foreground: rgb(var(--muted-foreground));
+  --color-fd-popover: rgb(var(--popover));
+  --color-fd-popover-foreground: rgb(var(--popover-foreground));
+  --color-fd-card: rgb(var(--card));
+  --color-fd-card-foreground: rgb(var(--card-foreground));
+  --color-fd-border: rgb(var(--border));
+  --color-fd-primary: rgb(var(--primary));
+  --color-fd-primary-foreground: rgb(var(--primary-foreground));
+  --color-fd-secondary: rgb(var(--secondary));
+  --color-fd-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-fd-accent: rgb(var(--accent));
+  --color-fd-accent-foreground: rgb(var(--accent-foreground));
+  --color-fd-ring: rgb(var(--ring));
+}
+
+/* ── Layout ── */
+
+:root {
+  --fd-nav-height: 60px;
+}
+
+#nd-docs-layout {
+  --fd-banner-height: var(--fd-nav-height);
+}
+
+#nd-page {
+  padding-top: calc(var(--fd-nav-height) + 1.5rem);
+  padding-bottom: 0;
+}
+@media (min-width: 48rem) {
+  #nd-page {
+    padding-top: calc(var(--fd-nav-height) + 2rem);
+  }
+}
+
+html, body {
+  overscroll-behavior-y: none;
+}
+
+/* ── Nav bold-ghost trick (prevents shift on active state) ── */
+
+.nav-links a {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nav-links a::after {
+  content: attr(data-label);
+  font-weight: 600;
+  height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── Overlay below nav ── */
+
+[class*="bg-fd-overlay"] {
+  top: var(--fd-nav-height) !important;
+}
+
+/* ── Sidebar ── */
+
+#nd-sidebar {
+  border: 0 !important;
+  border-right: 1px solid rgb(var(--border)) !important;
+  border-radius: 0 !important;
+  font-size: 13px;
+  transition: translate 220ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+#nd-sidebar > div:first-child {
+  display: none !important;
+}
+
+#nd-sidebar [class*="overscroll-contain"] {
+  padding-top: 12px !important;
+}
+
+/* Disable sidebar fade masks */
+#nd-sidebar [class*="mask-["],
+[class*="[grid-area:toc]"] [class*="mask-["] {
+  mask: none !important;
+  -webkit-mask: none !important;
+}
+
+/* Hide collapse buttons */
+div:has(> button[aria-label="Collapse Sidebar"]),
+div:has(> button[aria-label="Expand Sidebar"]) {
+  display: none !important;
+}
+
+/* ── Code blocks ── */
+
+pre:has(code) {
+  border: 1px solid rgba(var(--border), 0.5) !important;
+  border-radius: 0.625rem !important;
+  box-shadow: var(--shadow-card) !important;
+  transition: box-shadow 200ms, border-color 200ms;
+}
+
+pre:has(code):hover {
+  box-shadow: var(--shadow-card-hover) !important;
+  border-color: rgb(var(--border)) !important;
+}
+
+.dark pre:has(code) {
+  background: rgb(9 9 11) !important;
+}
+
+:not(pre) > code {
+  background: rgb(var(--muted)) !important;
+  border: 1px solid rgb(var(--border)) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.125rem 0.375rem !important;
+  font-size: 0.85em !important;
+  font-weight: 500 !important;
+}
+
+/* ── Typography ── */
+
+h2, h3, h4 {
+  scroll-margin-top: 5rem;
+}
+
+.prose a, article a {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 150ms;
+}
+
+.prose a:hover, article a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Global transitions ── */
+
+a, button {
+  transition: color 150ms, background-color 150ms, border-color 150ms, box-shadow 150ms;
+}

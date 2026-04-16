@@ -14,41 +14,17 @@ function chunk(value: string, size: number): string[] {
 }
 
 function buildBlocks(inbox: InboxRequest): KnownBlock[] {
-  const now = new Date()
-    .toISOString()
-    .replace("T", " ")
-    .slice(0, 19);
+  const now = new Date().toISOString().replace("T", " ").slice(0, 19);
 
   const blocks: KnownBlock[] = [
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: `New message received (${now})`,
-      },
-    },
-    {
-      type: "section",
-      text: { type: "mrkdwn", text: "*Headers*" },
-    },
-    {
-      type: "section",
-      text: {
-        type: "mrkdwn",
-        text: "```" + inbox.headers.join("\n") + "```",
-      },
-    },
-    {
-      type: "section",
-      text: { type: "mrkdwn", text: "*Body*" },
-    },
+    { type: "section", text: { type: "mrkdwn", text: `New message received (${now})` } },
+    { type: "section", text: { type: "mrkdwn", text: "*Headers*" } },
+    { type: "section", text: { type: "mrkdwn", text: "```" + inbox.headers.join("\n") + "```" } },
+    { type: "section", text: { type: "mrkdwn", text: "*Body*" } },
   ];
 
   for (const piece of chunk(inbox.body, BODY_CHUNK_SIZE)) {
-    blocks.push({
-      type: "section",
-      text: { type: "mrkdwn", text: "```" + piece + "```" },
-    });
+    blocks.push({ type: "section", text: { type: "mrkdwn", text: "```" + piece + "```" } });
   }
 
   return blocks;
@@ -75,10 +51,7 @@ export async function postInboxToSlack(inbox: InboxRequest): Promise<void> {
     try {
       await client.files.uploadV2({
         channel_id: channel,
-        file_uploads: inbox.files.map((f) => ({
-          filename: f.name,
-          file: f.buffer,
-        })),
+        file_uploads: inbox.files.map((f) => ({ filename: f.name, file: f.buffer })),
       });
     } catch (err) {
       logger.error({ err }, "slack file upload failed");
